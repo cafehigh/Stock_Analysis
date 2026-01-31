@@ -1,0 +1,122 @@
+import yfinance as yf
+import pandas as pd
+import pandas_ta as ta
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+
+# Define stock symbol and date range
+symbol = 'AAPL'  # Replace with your desired stock ticker
+end_date = datetime.today()
+start_date = end_date - timedelta(days=365)  # Last 1 year
+
+# Fetch stock data
+stock_data = yf.download(symbol, start=start_date, end=end_date)
+
+# Calculate technical indicators using pandas-ta
+stock_data.ta.macd(append=True)
+stock_data.ta.rsi(append=True)
+stock_data.ta.bbands(append=True)
+stock_data.ta.sma(length=20, append=True)
+stock_data.ta.ema(length=50, append=True)
+stock_data.ta.stoch(append=True)
+stock_data.ta.adx(append=True)
+stock_data.ta.willr(append=True)
+stock_data.ta.cmf(append=True)
+stock_data.ta.psar(append=True)
+
+# Display summary of last trading day
+last_day_summary = stock_data.iloc[-1][[
+    'Adj Close', 'MACD_12_26_9', 'MACD_histogram_12_26_9', 'RSI_14',
+    'BBL_5_2.0', 'BBM_5_2.0', 'BBU_5_2.0', 'SMA_20', 'EMA_50',
+    'STOCHk_14_3_3', 'STOCHd_14_3_3', 'ADX_14', 'WILLR_14', 'CMF_20',
+    'PSARl_0.02_0.2', 'PSARs_0.02_0.2'
+]]
+print("Summary of Technical Indicators for the Last Day:")
+print(last_day_summary)
+
+# Plot technical indicators
+plt.figure(figsize=(14, 10))
+
+# Price & Moving Averages
+plt.subplot(3, 3, 1)
+plt.plot(stock_data.index, stock_data['Adj Close'], label='Adj Close', color='blue')
+plt.plot(stock_data.index, stock_data['SMA_20'], label='SMA 20', color='orange')
+plt.plot(stock_data.index, stock_data['EMA_50'], label='EMA 50', color='green')
+plt.title("Price Trend")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# RSI
+plt.subplot(3, 3, 2)
+plt.plot(stock_data['RSI_14'], label='RSI')
+plt.axhline(y=70, color='r', linestyle='--', label='Overbought')
+plt.axhline(y=30, color='g', linestyle='--', label='Oversold')
+plt.title("RSI Indicator")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# Bollinger Bands
+plt.subplot(3, 3, 3)
+plt.plot(stock_data.index, stock_data['BBU_5_2.0'], label='Upper BB')
+plt.plot(stock_data.index, stock_data['BBM_5_2.0'], label='Middle BB')
+plt.plot(stock_data.index, stock_data['BBL_5_2.0'], label='Lower BB')
+plt.plot(stock_data.index, stock_data['Adj Close'], label='Adj Close', color='brown')
+plt.title("Bollinger Bands")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# MACD
+plt.subplot(3, 3, 4)
+plt.plot(stock_data['MACD_12_26_9'], label='MACD')
+plt.plot(stock_data['MACD_histogram_12_26_9'], label='MACD Histogram', color='gray')
+plt.title("MACD Indicator")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# Stochastic Oscillator
+plt.subplot(3, 3, 5)
+plt.plot(stock_data.index, stock_data['STOCHk_14_3_3'], label='Stoch %K')
+plt.plot(stock_data.index, stock_data['STOCHd_14_3_3'], label='Stoch %D')
+plt.title("Stochastic Oscillator")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# ADX
+plt.subplot(3, 3, 6)
+plt.plot(stock_data.index, stock_data['ADX_14'], label='ADX')
+plt.title("Average Directional Index (ADX)")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# Williams %R
+plt.subplot(3, 3, 7)
+plt.plot(stock_data.index, stock_data['WILLR_14'], label='Williams %R')
+plt.title("Williams %R")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# CMF
+plt.subplot(3, 3, 8)
+plt.plot(stock_data.index, stock_data['CMF_20'], label='CMF')
+plt.title("Chaikin Money Flow (CMF)")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+# PSAR
+plt.subplot(3, 3, 9)
+plt.plot(stock_data.index, stock_data['PSARs_0.02_0.2'], label='PSAR')
+plt.title("Parabolic SAR")
+plt.legend()
+plt.gca().xaxis.set_major_formatter(plt.matplotlib.dates.DateFormatter('%b%d'))
+plt.xticks(rotation=45)
+
+plt.tight_layout()
+plt.show()
